@@ -83,6 +83,18 @@ if (!localStorage.getItem('calorias-presets-v4')) {
   localStorage.setItem('calorias-entries-v1', JSON.stringify(entries));
   localStorage.setItem('calorias-presets-v4', '1');
 }
+// Correct the birria taco estimate even for installs that already ran preset v4.
+if (!localStorage.getItem('calorias-presets-v5')) {
+  const tacoName = 'Compadres, 1 taco de birria (estimado)';
+  const taco = foods.find(food => food.id === 'preset-compadres-birria-taco');
+  if (taco) taco.calories = 250;
+  for (const entry of entries) {
+    if (entry.name === tacoName) entry.calories = Math.round(250 * Number(entry.quantity || 1));
+  }
+  localStorage.setItem('calorias-foods-v1', JSON.stringify(foods));
+  localStorage.setItem('calorias-entries-v1', JSON.stringify(entries));
+  localStorage.setItem('calorias-presets-v5', '1');
+}
 
 function persist() {
   localStorage.setItem('calorias-foods-v1', JSON.stringify(foods));
