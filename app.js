@@ -27,7 +27,7 @@ const starterFoods = [
   ['papajohns-suprema', 'Papa John’s, porción Suprema (estimado)', 330],
   ['compadres-birria-taco', 'Compadres, 1 taco de birria (estimado)', 220],
   ['lafabbrica-pomodoro', 'La Fabbrica, penne Pomodoro con extra de quesos (estimado)', 900],
-  ['cosi-cheesy-promo-pomodoro', 'Così, Cheesy Promo Pomodoro (estimado)', 700],
+  ['cosi-cheesy-promo-pomodoro', 'Così, Cheesy Promo Pomodoro (estimado)', 610],
   ['arroz-carne', 'Plato de arroz y carne', 500],
   ['arroz-pollo', 'Plato de arroz y pollo', 500]
 ].map(([id, name, calories]) => ({id: `preset-${id}`, name, calories}));
@@ -36,6 +36,13 @@ if (!localStorage.getItem('calorias-presets-v2')) {
   foods = [...starterFoods.filter(food => !existingIds.has(food.id)), ...foods];
   localStorage.setItem('calorias-presets-v2', '1');
   localStorage.setItem('calorias-foods-v1', JSON.stringify(foods));
+}
+// Correct the combo estimate if an earlier version of the starter menu was installed.
+if (!localStorage.getItem('calorias-presets-v3')) {
+  const cheesyPromo = foods.find(food => food.id === 'preset-cosi-cheesy-promo-pomodoro');
+  if (cheesyPromo) cheesyPromo.calories = 610;
+  localStorage.setItem('calorias-foods-v1', JSON.stringify(foods));
+  localStorage.setItem('calorias-presets-v3', '1');
 }
 
 function persist() {
