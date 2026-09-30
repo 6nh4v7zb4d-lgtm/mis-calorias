@@ -7,6 +7,37 @@ let entries = read('calorias-entries-v1', []);
 let quantities = {};
 $('day').value = localDate;
 
+// Add starter foods once without replacing the user's existing menu or records.
+const starterFoods = [
+  ['te-frio-500', 'Té frío 500 ml', 50],
+  ['te-frio-350', 'Té frío 350 ml', 20],
+  ['pasta-macarrones', 'Pasta y macarrones', 500],
+  ['prensada', 'Prensada', 200],
+  ['media-prensada', 'Media prensada', 100],
+  ['brownie', 'Brownie', 350],
+  ['subway-tripleta-15-oil', 'Subway Tripleta 15 cm, con aceite (estimado)', 800],
+  ['subway-tripleta-15-no-oil', 'Subway Tripleta 15 cm, sin aceite (estimado)', 760],
+  ['subway-tripleta-30-oil', 'Subway Tripleta 30 cm, con aceite (estimado)', 1600],
+  ['subway-tripleta-30-no-oil', 'Subway Tripleta 30 cm, sin aceite (estimado)', 1520],
+  ['sandwich-casa', 'Sándwich de casa', 500],
+  ['sandwich-cole', 'Sándwich del cole', 200],
+  ['ready-pizza-pepperoni', 'Ready Pizza, porción de pepperoni (estimado)', 270],
+  ['papajohns-pepperoni', 'Papa John’s, porción de pepperoni (estimado)', 320],
+  ['papajohns-pepperoni-stuffed', 'Papa John’s, pepperoni con borde relleno (estimado)', 390],
+  ['papajohns-suprema', 'Papa John’s, porción Suprema (estimado)', 330],
+  ['compadres-birria-taco', 'Compadres, 1 taco de birria (estimado)', 220],
+  ['lafabbrica-pomodoro', 'La Fabbrica, penne Pomodoro con extra de quesos (estimado)', 900],
+  ['cosi-cheesy-promo-pomodoro', 'Così, Cheesy Promo Pomodoro (estimado)', 700],
+  ['arroz-carne', 'Plato de arroz y carne', 500],
+  ['arroz-pollo', 'Plato de arroz y pollo', 500]
+].map(([id, name, calories]) => ({id: `preset-${id}`, name, calories}));
+if (!localStorage.getItem('calorias-presets-v2')) {
+  const existingIds = new Set(foods.map(food => food.id));
+  foods = [...starterFoods.filter(food => !existingIds.has(food.id)), ...foods];
+  localStorage.setItem('calorias-presets-v2', '1');
+  localStorage.setItem('calorias-foods-v1', JSON.stringify(foods));
+}
+
 function persist() {
   localStorage.setItem('calorias-foods-v1', JSON.stringify(foods));
   localStorage.setItem('calorias-entries-v1', JSON.stringify(entries));
