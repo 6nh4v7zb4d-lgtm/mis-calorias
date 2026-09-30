@@ -95,6 +95,52 @@ if (!localStorage.getItem('calorias-presets-v5')) {
   localStorage.setItem('calorias-entries-v1', JSON.stringify(entries));
   localStorage.setItem('calorias-presets-v5', '1');
 }
+// Reapply researched calories for all existing installs, including those that ran an earlier v4 migration.
+if (!localStorage.getItem('calorias-presets-v6')) {
+  const researched = {
+    'preset-subway-tripleta-15-oil': ['Subway Tripleta 15 cm, con aceite (estimado)', 920],
+    'preset-subway-tripleta-15-no-oil': ['Subway Tripleta 15 cm, sin aceite (estimado)', 880],
+    'preset-subway-tripleta-30-oil': ['Subway Tripleta 30 cm, con aceite (estimado)', 1840],
+    'preset-subway-tripleta-30-no-oil': ['Subway Tripleta 30 cm, sin aceite (estimado)', 1760],
+    'preset-ready-pizza-pepperoni': ['Ready Pizza, porción de pepperoni (estimado)', 270],
+    'preset-papajohns-pepperoni': ['Papa John’s, pepperoni grande (guía oficial EE. UU.; CR puede variar)', 320],
+    'preset-papajohns-pepperoni-stuffed': ['Papa John’s, pepperoni con borde relleno (guía EE. UU.; CR puede variar)', 390],
+    'preset-papajohns-suprema': ['Papa John’s Suprema (referencia oficial El Salvador; CR puede variar)', 330],
+    'preset-compadres-birria-taco': ['Compadres, 1 taco de birria (estimado)', 250],
+    'preset-lafabbrica-pomodoro': ['La Fabbrica, penne Pomodoro con extra de quesos (estimado)', 900],
+    'preset-cosi-cheesy-promo-pomodoro': ['Così, Cheesy Promo Pomodoro (estimado)', 610]
+  };
+  const previousNames = {
+    'Subway Tripleta 15 cm, con aceite (estimado)': 'preset-subway-tripleta-15-oil',
+    'Subway Tripleta 15 cm, sin aceite (estimado)': 'preset-subway-tripleta-15-no-oil',
+    'Subway Tripleta 30 cm, con aceite (estimado)': 'preset-subway-tripleta-30-oil',
+    'Subway Tripleta 30 cm, sin aceite (estimado)': 'preset-subway-tripleta-30-no-oil',
+    'Ready Pizza, porción de pepperoni (estimado)': 'preset-ready-pizza-pepperoni',
+    'Papa John’s, porción de pepperoni (estimado)': 'preset-papajohns-pepperoni',
+    'Papa John’s, pepperoni con borde relleno (estimado)': 'preset-papajohns-pepperoni-stuffed',
+    'Papa John’s, porción Suprema (estimado)': 'preset-papajohns-suprema',
+    'Compadres, 1 taco de birria (estimado)': 'preset-compadres-birria-taco',
+    'La Fabbrica, penne Pomodoro con extra de quesos (estimado)': 'preset-lafabbrica-pomodoro',
+    'Così, Cheesy Promo Pomodoro (estimado)': 'preset-cosi-cheesy-promo-pomodoro'
+  };
+  const currentNames = {};
+  for (const [id, [name, calories]] of Object.entries(researched)) {
+    currentNames[name] = id;
+    const food = foods.find(item => item.id === id);
+    if (food) [food.name, food.calories] = [name, calories];
+  }
+  for (const entry of entries) {
+    const id = previousNames[entry.name] || currentNames[entry.name];
+    const update = researched[id];
+    if (update) {
+      entry.name = update[0];
+      entry.calories = Math.round(update[1] * Number(entry.quantity || 1));
+    }
+  }
+  localStorage.setItem('calorias-foods-v1', JSON.stringify(foods));
+  localStorage.setItem('calorias-entries-v1', JSON.stringify(entries));
+  localStorage.setItem('calorias-presets-v6', '1');
+}
 
 function persist() {
   localStorage.setItem('calorias-foods-v1', JSON.stringify(foods));
